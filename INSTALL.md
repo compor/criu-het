@@ -21,6 +21,13 @@ Thus one can type
 
 and get everything installed under `/some/new/place`.
 
+It is recommended to use the `DESTDIR` and `PREFIX` variables together, especially since the latter defaults to
+`/usr/local`, as in
+
+```
+make install DESTDIR=/some/new/place PREFIX=
+```
+
 ## Uninstalling CRIU
 
 To clean up previously installed CRIU instance one can type
@@ -42,7 +49,18 @@ If a package was installed after a failed compilation, use "make mrproper-top" t
 
 Additional packages maybe needed, please refer to: https://criu.org/Installation
 
+Moreover, it might be preferable to actually select which Python version (2 or 3) the installed Python tools (e.g.,
+`crit`) are meant to use.
+This can be forced by selected the corresponding Python interpreter during building and installing by setting the
+`PYTHON` variable, e.g. for choosing Python 3:
 
+```
+make install PYTHON=python3
+```
+
+This is possible because the Make variable `PYTHON` can be overidden as is currently defined in the included Makefile
+`scripts/nmk/scripts/tools.mk`. Make sure you adjust the relevant packages appropriately (e.g., install
+`python3-protobuf` instead of `python-protobuf`).
 
 ## Install CRIU-HET
 
