@@ -7,7 +7,6 @@ import json
 import sys
 import pycriu
 import copy
-import pyfastcopy
 import shutil
 import tempfile
 import time
