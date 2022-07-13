@@ -302,6 +302,8 @@ def main():
 			formatter_class=argparse.RawTextHelpFormatter)
 
 	subparsers = parser.add_subparsers(help='Use crit CMD --help for command-specific help')
+	if (sys.version_info[0] == 3 and sys.version_info[1] >= 7) or sys.version_info[0] > 3:
+		subparsers.required = True
 
 	# Decode
 	decode_parser = subparsers.add_parser('decode',
