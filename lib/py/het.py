@@ -40,13 +40,13 @@ class X86Struct(Structure):
 	gregs=["rax","rdx","rcx","rbx","rsi","rdi","rbp","rsp","r8","r9","r10","r11","r12","r13","r14","r15"]
 	for grn in gregs:
 		_fields_.append((grn, c_ulonglong))
-	_fields_.append(("mmx", Reg64*8)) 
-	_fields_.append(("xmm", Reg128*16)) 
-	_fields_.append(("st", c_longdouble*8)) 
+	_fields_.append(("mmx", Reg64*8))
+	_fields_.append(("xmm", Reg128*16))
+	_fields_.append(("st", c_longdouble*8))
 	csregs=["cs","ss","ds","es","fs","gs"]
 	for grn in csregs:
 		_fields_.append((grn, c_uint32))
-	_fields_.append(("rflags", c_uint64)) 
+	_fields_.append(("rflags", c_uint64))
 
 def ordered_dict_prepend(dct, key, value, dict_setitem=dict.__setitem__):
 	root = dct._OrderedDict__root
@@ -89,8 +89,8 @@ class Converter():
 		else:
 			e = ELF(binary)
 			ELF_binaries[binary] = e
-		
-		addr=long(e.symbols[symbol]) 
+
+		addr=long(e.symbols[symbol])
 		het_log("found address", hex(addr))
 		return addr
 
@@ -98,13 +98,13 @@ class Converter():
 		###use a cache to avoid reloading the same file multiple times
 		if file_path in IMG_files:
 			return IMG_files[file_path]
-		
+
 		try:
 			pgm_img = pycriu.images.load(open(file_path, 'rb'), pretty=True)
 		except pycriu.images.MagicException as exc:
 			print("Error reading", file_path)
 			sys.exit(1)
-			
+
 		IMG_files[file_path] = pgm_img
 		return pgm_img
 
@@ -136,9 +136,9 @@ class Converter():
 		fd.seek(region_offset)
 		dest_regs = struct_def()
 
-		#het_log "reading", fd.read(-1) 
+		#het_log "reading", fd.read(-1)
 		#return
-		ret=fd.readinto(dest_regs) 
+		ret=fd.readinto(dest_regs)
 		het_log("size", sizeof(dest_regs), "ret", ret)
 		het_log("magic", hex(dest_regs.magic))
 		return dest_regs
@@ -148,7 +148,7 @@ class Converter():
 		fd=open(pages_file, 'rb')
 		fd.seek(region_offset)
 		dest_reg = Reg64()
-		ret=fd.readinto(dest_reg) 
+		ret=fd.readinto(dest_reg)
 		return dest_reg.x
 
 
@@ -164,7 +164,7 @@ class Converter():
 		rrfm_time2 = time.time()
 		regs= self.read_struct_from_pages(pages_file, region_offset, struct_def)
 		rrfm_time3 = time.time()
-		
+
 		het_log("rrfm", rrfm_time1 -rrfm_time, rrfm_time2 -rrfm_time1, rrfm_time3 -rrfm_time2)
 		return regs
 
@@ -179,7 +179,7 @@ class Converter():
 			print("rtfm: addr region not found", (rrfm_time1 - rrfm_time), (rrfm_time2 - rrfm_time1))
 			return
 		rrfm_time2 = time.time()
-		
+
 		het_log("rtfm", rrfm_time -rrfm_time, rrfm_time2 -rrfm_time1)
 		tls_addr=self.read_llong_from_pages(pages_file, region_offset)
 		het_log("!!!!tls_base", hex(tls_addr))
@@ -240,7 +240,7 @@ class Converter():
 			if region_type in vma["status"]:
 				region_start=int(vma["start"], 16)
 				region_end=int(vma["end"], 16)
-				
+
 				het_log("removing vma",mm_img["entries"][0]["vmas"][idx])
 				ret_mm = copy.deepcopy(mm_img["entries"][0]["vmas"][idx])
 				del mm_img["entries"][0]["vmas"][idx]
@@ -252,7 +252,7 @@ class Converter():
 			return -1
 
 		het_log(hex(region_start), hex(region_end))
-		
+
 		#pagemap
 		idx=0
 		found=False
@@ -267,7 +267,7 @@ class Converter():
 			page_nbr = pgmap['nr_pages']
 			if addr >= region_start and addr <= region_end:
 				found=True
-				
+
 				het_log("removing pagemap", pagemap_img["entries"][idx])
 				ret_pmap = copy.deepcopy(pagemap_img["entries"][idx])
 				del pagemap_img["entries"][idx]
@@ -275,7 +275,7 @@ class Converter():
 			idx+=1
 			page_start_nbr+=page_nbr
 		assert(page_nbr!=-1)
-		
+
 		new_size=original_size
 		if(found):
 			###original_size=os.stat(pages_path).st_size
@@ -375,7 +375,7 @@ class Converter():
 		###page_tmp=open(pages_path, "r+b")
 		page_tmp.seek(page_offset)
 		buff=page_tmp.read(original_size-page_offset)
-		
+
 		page_tmp.seek(page_offset)
 		het_log(buff_size, len(cnt_tmpl))
 		assert(buff_size == len(cnt_tmpl))
@@ -430,9 +430,9 @@ class Converter():
 		for fl in onlyfiles:
 			if str(pid) not in fl:
 				continue
-			if "pagemap" in fl:	
+			if "pagemap" in fl:
 				pagemap_file=os.path.join(directory, fl)
-			if "core" in fl:	
+			if "core" in fl:
 				core_file=os.path.join(directory, fl)
 			if "mm" in  fl:
 				mm_file=os.path.join(directory, fl)
@@ -443,15 +443,15 @@ class Converter():
 			if "pages-"+str(pages_id) in fl:
 				pages_file=os.path.join(directory, fl)
 		assert(pages_file)
-		
+
 		##get path to binary
 		binary=self.get_binary(files_file, mm_file, path_append)
-                tmp_root_dir = root_dir
-                tmp_root_dir += binary
-                binary = tmp_root_dir
+		tmp_root_dir = root_dir
+		tmp_root_dir += binary
+		binary = tmp_root_dir
 		het_log("path to binary", binary, path_append)
 		time_path = time.time()
-		
+
 		#convert core, fs, memory (vdso)
 		dest_core=self.get_target_core(arch, binary, pages_file, pagemap_file, core_file)
 		time_core = time.time()
@@ -506,7 +506,7 @@ class Converter():
 		files_file=None
 		handled_files=[]
 		for fl in onlyfiles:
-			if "pstree" in fl:	
+			if "pstree" in fl:
 				pstree_file=os.path.join(directory, fl)
 			if "files" in  fl: #use the same file across recode_pid
 				files_file_orig=os.path.join(directory, fl)
@@ -520,7 +520,7 @@ class Converter():
 		for _pid in self.get_all_pids(pstree_file):
 			ret=self.__recode_pid(_pid, arch, directory, outdir, onlyfiles, files_file, path_append,root_dir)
 			handled_files.extend(ret)
-		
+
 		#copy not transformed files
 		rec_t2 =time.time()
 		het_log("copying remaining files")
@@ -534,7 +534,7 @@ class Converter():
 				#copy not transformed files:
 				copyfile(src_file, dst_file)
 				het_log("done", fl)
-				
+
 		rec_t3 =time.time()
 		het_log("recode", (rec_t1 -rec_t0), (rec_t2 -rec_t1), (rec_t3 -rec_t2))
 
@@ -542,22 +542,22 @@ class Converter():
 class X8664Converter(Converter):
 	def __init__(self):
 		Converter.__init__(self)
-	
+
 	def __get_rlimits(self):
-		return [{"cur": 18446744073709551615, "max": 18446744073709551615}, 
-			{"cur": 18446744073709551615, "max": 18446744073709551615}, 
-			{"cur": 18446744073709551615, "max": 18446744073709551615}, 
-			{"cur": 8388608, "max": 18446744073709551615}, {"cur": 0, "max": 18446744073709551615}, 
-			{"cur": 18446744073709551615, "max": 18446744073709551615}, 
-			{"cur": 515133, "max": 515133}, 
-			{"cur": 8192, "max": 100000}, 
-			{"cur": 65536, "max": 65536}, 
-			{"cur": 18446744073709551615, "max": 18446744073709551615}, 
-			{"cur": 18446744073709551615, "max": 18446744073709551615}, 
-			{"cur": 515133, "max": 515133}, 
-			{"cur": 819200, "max": 819200}, 
-			{"cur": 0, "max": 0}, 
-			{"cur": 0, "max": 0}, 
+		return [{"cur": 18446744073709551615, "max": 18446744073709551615},
+			{"cur": 18446744073709551615, "max": 18446744073709551615},
+			{"cur": 18446744073709551615, "max": 18446744073709551615},
+			{"cur": 8388608, "max": 18446744073709551615}, {"cur": 0, "max": 18446744073709551615},
+			{"cur": 18446744073709551615, "max": 18446744073709551615},
+			{"cur": 515133, "max": 515133},
+			{"cur": 8192, "max": 100000},
+			{"cur": 65536, "max": 65536},
+			{"cur": 18446744073709551615, "max": 18446744073709551615},
+			{"cur": 18446744073709551615, "max": 18446744073709551615},
+			{"cur": 515133, "max": 515133},
+			{"cur": 819200, "max": 819200},
+			{"cur": 0, "max": 0},
+			{"cur": 0, "max": 0},
 			{"cur": 18446744073709551615, "max": 18446744073709551615}]
 
 	def convert_to_dest_core(self, pgm_img, dest_regs, dest_tls): #, old_stack_tmpl, new_stack_tmpl):
@@ -568,7 +568,7 @@ class X8664Converter(Converter):
 
 		###convert thread_info
 		src_info=pgm_img['entries'][0]['ti_aarch64']
-		dst_info=OrderedDict() 
+		dst_info=OrderedDict()
 		#copy clear_tid_addr
 		dst_info["clear_tid_addr"]=src_info["clear_tid_addr"]
 		#Gpregs
@@ -611,14 +611,14 @@ class X8664Converter(Converter):
 						0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0, 0, 0, 0, 2147483648, 16386, 0],
 			"xmm_space": [16, 48, 2343184048, 32767, 5384384, 0, 5261400, 0,
-						0, 0, 1, 0, 0, 0, 20, 0, 
+						0, 0, 1, 0, 0, 0, 20, 0,
 						0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0, 0, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0, 0, 0, 
-						0, 0, 0, 0, 0, 0, 0, 0], 
-			"xsave": { "xstate_bv": 3,  
+						0, 0, 0, 0, 0, 0, 0, 0,
+						0, 0, 0, 0, 0, 0, 0, 0],
+			"xsave": { "xstate_bv": 3,
 						"ymmh_space": [0, 0, 0, 0, 0, 0, 0, 0,
 									0, 0, 0, 0, 0, 0, 0, 0,
 									0, 0, 0, 0, 0, 0, 0, 0,
@@ -627,49 +627,49 @@ class X8664Converter(Converter):
 									0, 0, 0, 0, 0, 0, 0, 0,
 									0, 0, 0, 0, 0, 0, 0, 0,
 									0, 0, 0, 0, 0, 0, 0, 0] }
-		} 
+		}
 		#TLS
 		dst_info["tls"]=[
 					{
-					"entry_number": 12, 
-					"base_addr": 0, 
-					"limit": 0, 
-					"seg_32bit": False, 
-					"contents_h": False, 
-					"contents_l": False, 
-					"read_exec_only": True, 
-					"limit_in_pages": False, 
-					"seg_not_present": True, 
+					"entry_number": 12,
+					"base_addr": 0,
+					"limit": 0,
+					"seg_32bit": False,
+					"contents_h": False,
+					"contents_l": False,
+					"read_exec_only": True,
+					"limit_in_pages": False,
+					"seg_not_present": True,
 					"useable": False
-					}, 
+					},
 					{
-					"entry_number": 13, 
-					"base_addr": 0, 
-					"limit": 0, 
-					"seg_32bit": False, 
-					"contents_h": False, 
-					"contents_l": False, 
-					"read_exec_only": True, 
-					"limit_in_pages": False, 
-					"seg_not_present": True, 
+					"entry_number": 13,
+					"base_addr": 0,
+					"limit": 0,
+					"seg_32bit": False,
+					"contents_h": False,
+					"contents_l": False,
+					"read_exec_only": True,
+					"limit_in_pages": False,
+					"seg_not_present": True,
 					"useable": False
-					}, 
+					},
 					{
-					"entry_number": 14, 
-					"base_addr": 0, 
-					"limit": 0, 
-					"seg_32bit": False, 
-					"contents_h": False, 
-					"contents_l": False, 
-					"read_exec_only": True, 
-					"limit_in_pages": False, 
-					"seg_not_present": True, 
+					"entry_number": 14,
+					"base_addr": 0,
+					"limit": 0,
+					"seg_32bit": False,
+					"contents_h": False,
+					"contents_l": False,
+					"read_exec_only": True,
+					"limit_in_pages": False,
+					"seg_not_present": True,
 					"useable": False
 					}
 		]
 
 		#delete old entry and add the new one
-		del pgm_img['entries'][0]['ti_aarch64'] 
+		del pgm_img['entries'][0]['ti_aarch64']
 		ordered_dict_prepend(pgm_img['entries'][0], 'thread_info', dst_info)
 		ordered_dict_prepend(pgm_img['entries'][0], 'mtype', "X86_64")
 
@@ -681,7 +681,7 @@ class X8664Converter(Converter):
 		#pgm_img['entries'][0]['thread_core']['creds']['euid'] = 1003
 		#pgm_img['entries'][0]['thread_core']['creds']['suid'] = 1003
 		#pgm_img['entries'][0]['thread_core']['creds']['fsuid'] = 1003
-		
+
 		het_log(pgm_img)
 		return pgm_img
 
@@ -690,16 +690,16 @@ class X8664Converter(Converter):
 	def __move_stack(self, pages_file, pagemap_file, core_file, mm_file):
 		#FIXME: another wy to find the region than using MAP_GROWSDOWN?
 		mm_tmpl, pgmap_tmpl, cnt_tmpl = self.remove_region_type(mm_img, pagemap_img, pages_tmp, "MAP_GROWSDOWN")
-		new_mm_tmpl= {	"start": "0x7fff99600000", 
-				    "end": "0x7fff99e00000", 
-				    "pgoff": 0, 
-				    "shmid": 0, 
-				    "prot": "PROT_READ | PROT_WRITE", 
-				    "flags": "MAP_PRIVATE | MAP_ANON | MAP_GROWSDOWN", 
-				    "status": "VMA_AREA_REGULAR | VMA_ANON_PRIVATE", 
+		new_mm_tmpl= {	"start": "0x7fff99600000",
+				    "end": "0x7fff99e00000",
+				    "pgoff": 0,
+				    "shmid": 0,
+				    "prot": "PROT_READ | PROT_WRITE",
+				    "flags": "MAP_PRIVATE | MAP_ANON | MAP_GROWSDOWN",
+				    "status": "VMA_AREA_REGULAR | VMA_ANON_PRIVATE",
 				    "fd": -1 }
 		self.__add_target_region(mm_img, pagemap_img, pages_tmp, new_mm_tmpl, pgmap_tmpl, cnt_tmpl)
-	"""		
+	"""
 
 	def get_target_core(self, architecture, binary, pages_file, pagemap_file, core_file):
 		#old_stack_tmpl, new_stack_tmpl = self.__move_stack(pages_file, pagemap_file, core_file, mm_file)
@@ -709,7 +709,7 @@ class X8664Converter(Converter):
 		dest_tls=self.read_tls_from_memory(binary, architecture, pagemap_file, pages_file)
 		target_tls = time.time()
 		het_log( "x86_64", binary, architecture, pagemap_file, pages_file)
-		
+
 		src_core=self.get_src_core(core_file)
 		target_src = time.time()
 		dst_core=self.convert_to_dest_core(src_core, dest_regs, dest_tls)#, old_stack_tmpl, new_stack_tmpl)
@@ -721,13 +721,13 @@ class X8664Converter(Converter):
 	def get_target_files(self, files_path, mm_file, path_append, root_dir):
 		files_img=self.load_image_file(files_path)
 		fid, idx, bin_path=self.get_binary_info(files_path, mm_file, path_append)
-                tmp_root_dir = root_dir
-                tmp_root_dir += bin_path
-                bin_path = tmp_root_dir
+		tmp_root_dir = root_dir
+		tmp_root_dir += bin_path
+		bin_path = tmp_root_dir
 		path_x86_64=bin_path+"_x86-64"
 		path_aarch64=bin_path+"_aarch64"
 		assert(os.path.isfile(path_x86_64) and os.path.isfile(path_aarch64))
-		
+
 		#copy file to appropriate arch
 		#copyfile(path_x86_64, bin_path)
 		statinfo = os.stat(path_x86_64)
@@ -735,41 +735,41 @@ class X8664Converter(Converter):
 		return files_img
 
 	def get_vsyscall_template(self):
-		mm={"start": "0xffffffffff600000", 
-			"end": "0xffffffffff601000", 
-			"pgoff": 0, 
-			"shmid": 0, 
-			"prot": "PROT_READ | PROT_EXEC", 
-			"flags": "MAP_PRIVATE | MAP_ANON", 
-			"status": "VMA_AREA_VSYSCALL | VMA_ANON_PRIVATE", 
+		mm={"start": "0xffffffffff600000",
+			"end": "0xffffffffff601000",
+			"pgoff": 0,
+			"shmid": 0,
+			"prot": "PROT_READ | PROT_EXEC",
+			"flags": "MAP_PRIVATE | MAP_ANON",
+			"status": "VMA_AREA_VSYSCALL | VMA_ANON_PRIVATE",
 			"fd": -1
 			}
 		return mm, None, None
-    
+
 	def get_vvar_template(self):
-		mm={"start": "0x7fff99ec6000", 
-			"end": "0x7fff99ec9000", 
-			"pgoff": 0, 
-			"shmid": 0, 
-			"prot": "PROT_READ", 
-			"flags": "MAP_PRIVATE | MAP_ANON", 
-			"status": "VMA_AREA_REGULAR | VMA_ANON_PRIVATE | VMA_AREA_VVAR", 
-			"fd": -1, 
+		mm={"start": "0x7fff99ec6000",
+			"end": "0x7fff99ec9000",
+			"pgoff": 0,
+			"shmid": 0,
+			"prot": "PROT_READ",
+			"flags": "MAP_PRIVATE | MAP_ANON",
+			"status": "VMA_AREA_REGULAR | VMA_ANON_PRIVATE | VMA_AREA_VVAR",
+			"fd": -1,
 			"madv": "0x10000"
 			}
 		#pgmap= { "vaddr": "0x7fff99ec7000", "nr_pages": 3, "flags": "PE_PRESENT"}
 		### vvar is not dumped in the pagemap either neither in the page list -- TODO need to check the source code
-		
+
 		return mm, None, None
 
 	def get_vdso_template(self):
-		mm= {"start": "0x7fff99ec9000", 
-			"end": "0x7fff99ecb000", 
-			"pgoff": 0, 
-			"shmid": 0, 
-			"prot": "PROT_READ | PROT_EXEC", 
-			"flags": "MAP_PRIVATE | MAP_ANON", 
-			"status": "VMA_AREA_REGULAR | VMA_AREA_VDSO | VMA_ANON_PRIVATE", 
+		mm= {"start": "0x7fff99ec9000",
+			"end": "0x7fff99ecb000",
+			"pgoff": 0,
+			"shmid": 0,
+			"prot": "PROT_READ | PROT_EXEC",
+			"flags": "MAP_PRIVATE | MAP_ANON",
+			"status": "VMA_AREA_REGULAR | VMA_AREA_VDSO | VMA_ANON_PRIVATE",
 			"fd": -1
 			}
 		pgmap= { "vaddr": "0x7fff99ec9000", "nr_pages": 2, "flags": "PE_PRESENT"}
@@ -788,31 +788,31 @@ class X8664Converter(Converter):
 		gtm_t0 =time.time()
 		mm_img=self.load_image_file(mm_file)
 		pagemap_img=self.load_image_file(pagemap_file)
-		
+
 		gtm_t1 =time.time()
 		copyfile(pages_file, dest_path)
-		
+
 		gtm_t2 =time.time()
 		original_size=os.stat(dest_path).st_size
 		page_tmp=open(dest_path, "r+b")
-		
+
 		gtm_t3 =time.time()
 		ret_size = self.remove_region_type(mm_img, pagemap_img, page_tmp, original_size, "VDSO")
-		if (ret_size > 0): 
+		if (ret_size > 0):
 			ret_size = self.add_target_region(mm_img, pagemap_img, page_tmp, ret_size, "VDSO")
 			if (ret_size > 0): original_size = ret_size
-		
+
 		gtm_t4 =time.time()
 		ret_size = self.remove_region_type(mm_img, pagemap_img, page_tmp, original_size, "VVAR")
-		if (ret_size > 0): 
+		if (ret_size > 0):
 			ret_size = self.add_target_region(mm_img, pagemap_img, page_tmp, ret_size, "VVAR")
 			if (ret_size > 0): original_size = ret_size
-				
+
 		ret_size= self.add_target_region(mm_img, pagemap_img, page_tmp, original_size, "VSYSCALL")
-		
+
 		gtm_t5 =time.time()
 		page_tmp.close()
-		
+
 		gtm_t6 =time.time()
 		het_log("gtm", (gtm_t1 -gtm_t0), (gtm_t2 -gtm_t1), (gtm_t3 -gtm_t2), (gtm_t4 -gtm_t3), (gtm_t5 - gtm_t4), (gtm_t6 -gtm_t5))
 		return mm_img, pagemap_img, dest_path
@@ -825,52 +825,52 @@ class Aarch64Converter(Converter):
 		Converter.__init__(self)
 
 	def __get_rlimits(self):
-		return [{"cur": 18446744073709551615, "max": 18446744073709551615}, 
-                {"cur": 18446744073709551615, "max": 18446744073709551615}, 
-                {"cur": 18446744073709551615, "max": 18446744073709551615}, 
-                {"cur": 8388608, "max": 18446744073709551615}, 
-                {"cur": 0, "max": 18446744073709551615}, 
-                {"cur": 18446744073709551615, "max": 18446744073709551615}, 
-                {"cur": 515133, "max": 515133}, 
-                {"cur": 1024, "max": 100000}, #x86_64 is {"cur": 8192, "max": 100000}, 
-                {"cur": 18446744073709551615, "max": 18446744073709551615}, #x86_64 is {"cur": 65536, "max": 65536}, 
-                {"cur": 18446744073709551615, "max": 18446744073709551615}, 
-                {"cur": 18446744073709551615, "max": 18446744073709551615}, 
-                {"cur": 515133, "max": 515133}, 
-                {"cur": 819200, "max": 819200}, 
-                {"cur": 0, "max": 0}, 
-                {"cur": 0, "max": 0}, 
+		return [{"cur": 18446744073709551615, "max": 18446744073709551615},
+                {"cur": 18446744073709551615, "max": 18446744073709551615},
+                {"cur": 18446744073709551615, "max": 18446744073709551615},
+                {"cur": 8388608, "max": 18446744073709551615},
+                {"cur": 0, "max": 18446744073709551615},
+                {"cur": 18446744073709551615, "max": 18446744073709551615},
+                {"cur": 515133, "max": 515133},
+                {"cur": 1024, "max": 100000}, #x86_64 is {"cur": 8192, "max": 100000},
+                {"cur": 18446744073709551615, "max": 18446744073709551615}, #x86_64 is {"cur": 65536, "max": 65536},
+                {"cur": 18446744073709551615, "max": 18446744073709551615},
+                {"cur": 18446744073709551615, "max": 18446744073709551615},
+                {"cur": 515133, "max": 515133},
+                {"cur": 819200, "max": 819200},
+                {"cur": 0, "max": 0},
+                {"cur": 0, "max": 0},
                 {"cur": 18446744073709551615, "max": 18446744073709551615}]
-    
+
 	def get_vsyscall_template(self):
 		return None, None, None
 
 	def get_vvar_template(self):
-		mm={ "start": "0xffffacaa5000", 
-			    "end": "0xffffacaa6000", 
-			    "pgoff": 0, 
-			    "shmid": 0, 
-			    "prot": "PROT_READ", 
-			    "flags": "MAP_PRIVATE | MAP_ANON", 
-			    "status": "VMA_AREA_REGULAR | VMA_ANON_PRIVATE | VMA_AREA_VVAR", 
+		mm={ "start": "0xffffacaa5000",
+			    "end": "0xffffacaa6000",
+			    "pgoff": 0,
+			    "shmid": 0,
+			    "prot": "PROT_READ",
+			    "flags": "MAP_PRIVATE | MAP_ANON",
+			    "status": "VMA_AREA_REGULAR | VMA_ANON_PRIVATE | VMA_AREA_VVAR",
 			    "fd": -1}
-		
+
 		###TODO where is pgmap= ?
 
 		return mm, None, None
 
 	def get_vdso_template(self):
-		mm= { "start": "0xffffacaa6000", 
-			    "end": "0xffffacaa7000", 
-			    "pgoff": 0, 
-			    "shmid": 0, 
-			    "prot": "PROT_READ | PROT_EXEC", 
-			    "flags": "MAP_PRIVATE | MAP_ANON", 
-			    "status": "VMA_AREA_REGULAR | VMA_AREA_VDSO | VMA_ANON_PRIVATE", 
+		mm= { "start": "0xffffacaa6000",
+			    "end": "0xffffacaa7000",
+			    "pgoff": 0,
+			    "shmid": 0,
+			    "prot": "PROT_READ | PROT_EXEC",
+			    "flags": "MAP_PRIVATE | MAP_ANON",
+			    "status": "VMA_AREA_REGULAR | VMA_AREA_VDSO | VMA_ANON_PRIVATE",
 			    "fd": -1
-			} 
-		pgmap={"vaddr": "0xffffacaa6000", 
-		    "nr_pages": 1, 
+			}
+		pgmap={"vaddr": "0xffffacaa6000",
+		    "nr_pages": 1,
 		    "flags": "PE_PRESENT"}
 		dir_path=os.path.dirname(os.path.realpath(__file__))
 		vdso_path=os.path.join(dir_path, "templates/", "aarch64_vdso.img.tmpl")
@@ -887,10 +887,10 @@ class Aarch64Converter(Converter):
 
 		###convert thread_info
 		src_info=pgm_img['entries'][0]['thread_info']
-		dst_info=OrderedDict() 
+		dst_info=OrderedDict()
 		dst_info["clear_tid_addr"]=src_info["clear_tid_addr"]
 		dst_info["tls"]=dest_tls
-		
+
 		##gpregs
 		dst_info["gpregs"]=OrderedDict()
 		#regs
@@ -926,8 +926,8 @@ class Aarch64Converter(Converter):
 		#pgm_img['entries'][0]['thread_core']['creds']['suid'] = 1004
 		#pgm_img['entries'][0]['thread_core']['creds']['fsuid'] = 1004
 		return pgm_img
-		
-	
+
+
 	def get_target_core(self, architecture, binary, pages_file, pagemap_file, core_file):
 		target_start = time.time()
 		dest_regs=self.read_regs_from_memory(binary, architecture, pagemap_file, pages_file, Aarch64Struct)
@@ -935,43 +935,43 @@ class Aarch64Converter(Converter):
 		dest_tls=self.read_tls_from_memory(binary, architecture, pagemap_file, pages_file)
 		target_tls = time.time()
 		het_log( "aarch64", binary, architecture, pagemap_file, pages_file)
-		
+
 		src_core=self.get_src_core(core_file)
 		target_src= time.time()
 		dst_core=self.convert_to_dest_core(src_core, dest_regs, dest_tls)
 		target_dst = time.time()
 		het_log("get_target_core aarch64", (target_regs - target_start), (target_tls - target_regs), (target_src - target_tls), (target_dst -target_src))
 		return dst_core
-	
+
 	def get_target_mem(self, mm_file, pagemap_file,  pages_file, dest_path):
 		gtm_t0 =time.time()
 		mm_img=self.load_image_file(mm_file)
 		pagemap_img=self.load_image_file(pagemap_file)
 
 		gtm_t1 =time.time()
-		copyfile(pages_file, dest_path)	
+		copyfile(pages_file, dest_path)
 
 		gtm_t2 =time.time()
 		original_size=os.stat(dest_path).st_size
 		page_tmp=open(dest_path, "r+b")
-		
+
 		gtm_t3 =time.time()
 		ret_size = self.remove_region_type(mm_img, pagemap_img, page_tmp, original_size, "VDSO")
 		if (ret_size > 0):
 			ret_size = self.add_target_region(mm_img, pagemap_img, page_tmp, ret_size, "VDSO")
 			if (ret_size > 0): original_size = ret_size
-		
+
 		gtm_t4 =time.time()
 		ret_size = self.remove_region_type(mm_img, pagemap_img, page_tmp, original_size, "VVAR")
 		if (ret_size > 0):
 			ret_size = self.add_target_region(mm_img, pagemap_img, page_tmp, original_size, "VVAR")
 			if (ret_size > 0): original_size = ret_size
-		
+
 		ret_size = self.remove_region_type(mm_img, pagemap_img, page_tmp, original_size, "VSYSCALL")
-		
+
 		gtm_t5 =time.time()
 		page_tmp.close()
-		
+
 		gtm_t6 =time.time()
 		het_log("gtm", (gtm_t1 -gtm_t0), (gtm_t2 -gtm_t1), (gtm_t3 -gtm_t2), (gtm_t4 -gtm_t3), (gtm_t5 - gtm_t4), (gtm_t6 -gtm_t5))
 		return mm_img, pagemap_img, dest_path
@@ -979,10 +979,10 @@ class Aarch64Converter(Converter):
 	def get_target_files(self, files_path, mm_file, path_append, root_dir):
 		files_img=self.load_image_file(files_path)
 		fid, idx, bin_path=self.get_binary_info(files_path, mm_file, path_append)
-                tmp_root_dir = root_dir
-                tmp_root_dir += bin_path
-                bin_path = tmp_root_dir
-                print bin_path 
+		tmp_root_dir = root_dir
+		tmp_root_dir += bin_path
+		bin_path = tmp_root_dir
+		print(bin_path)
 		path_x86_64=bin_path+"_x86-64"
 		path_aarch64=bin_path+"_aarch64"
 		assert(os.path.isfile(path_x86_64) and os.path.isfile(path_aarch64))

@@ -51,7 +51,7 @@ def recode(opts):
 	directory=get_default_arg(opts, 'directory', ".")
 	outdir=get_default_arg(opts, 'out', "new_image."+str(arch))
 	path_append=get_default_arg(opts, 'append', "")
-        root_dir=get_default_arg(opts, 'root',"")
+	root_dir=get_default_arg(opts, 'root',"")
 	if arch == "aarch64":
 		converter = Aarch64Converter()
 	elif arch == "x86_64" or arch == "x86-64":
@@ -363,14 +363,12 @@ def main():
 	recode_parser.add_argument('-o',
 			    '--out',
 			help = 'path to output dir')
-        recode_parser.add_argument('-r',
-                            '--root',
-                        help = 'root dir (default "")')
-
+	recode_parser.add_argument('-r',
+	        '--root',
+	        help = 'root dir (default "")')
 	recode_parser.set_defaults(func=recode, nopl=False)
 
 	opts = vars(parser.parse_args())
-
 	opts["func"](opts)
 
 if __name__ == '__main__':
