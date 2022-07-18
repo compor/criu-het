@@ -5,13 +5,13 @@
 import os
 import json
 import sys
-import pycriu
 import copy
 import shutil
 import tempfile
 import time
 import subprocess
 
+from . import images as pycriu_images
 from os import listdir
 from os.path import isfile, join
 from collections import OrderedDict
@@ -99,8 +99,8 @@ class Converter():
 			return IMG_files[file_path]
 
 		try:
-			pgm_img = pycriu.images.load(open(file_path, 'rb'), pretty=True)
-		except pycriu.images.MagicException as exc:
+			pgm_img = pycriu_images.load(open(file_path, 'rb'), pretty=True)
+		except pycriu_images.MagicException as exc:
 			print("Error reading", file_path)
 			sys.exit(1)
 
@@ -490,7 +490,7 @@ class Converter():
 				het_log("copy of pages file (mem) already done above... we modified the final copy directly")
 			else:
 				het_log("src", dest_img, "dst", dst_file)
-				pycriu.images.dump(dest_img, open(dst_file, "w+"))
+				pycriu_images.dump(dest_img, open(dst_file, "w+"))
 		time_copy = time.time()
 		print (pid, (time_path - time_start), (time_core - time_path), (time_files - time_core), (time_mem - time_files), (time_copy - time_mem))
 		return handled_files

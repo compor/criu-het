@@ -6,7 +6,7 @@ import fcntl
 import os
 import struct
 
-import pycriu.rpc_pb2 as rpc
+from . import rpc_pb2 as rpc
 
 class _criu_comm:
 	"""
