@@ -2,7 +2,7 @@
 all-y	+= crit
 
 crit/crit: crit/crit-$(PYTHON)
-	$(Q) cp $^ $@
+	$(Q) sed -e 's,@py_pkg_dir@,$(PY_PKG_DIR),' $^ > $@
 crit: crit/crit
 .PHONY: crit
 
