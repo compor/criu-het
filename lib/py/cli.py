@@ -5,8 +5,8 @@ import json
 import os
 from shutil import copyfile
 
-import pycriu
-from pycriu.het import Aarch64Converter, X8664Converter
+from . import images as pycriu_images
+from .het import Aarch64Converter, X8664Converter
 
 def inf(opts):
 	if opts['in']:
@@ -27,8 +27,8 @@ def decode(opts):
 	indent = None
 
 	try:
-		img = pycriu.images.load(inf(opts), opts['pretty'], opts['nopl'])
-	except pycriu.images.MagicException as exc:
+		img = pycriu_images.load(inf(opts), opts['pretty'], opts['nopl'])
+	except pycriu_images.MagicException as exc:
 		print("Unknown magic %#x.\n"\
 				"Maybe you are feeding me an image with "\
 				"raw data(i.e. pages.img)?" % exc.magic, file=sys.stderr)
@@ -60,10 +60,10 @@ def recode(opts):
 
 def encode(opts):
 	img = json.load(inf(opts))
-	pycriu.images.dump(img, outf(opts))
+	pycriu_images.dump(img, outf(opts))
 
 def info(opts):
-	infs = pycriu.images.info(inf(opts))
+	infs = pycriu_images.info(inf(opts))
 	json.dump(infs, sys.stdout, indent = 4)
 	print()
 
@@ -89,9 +89,9 @@ def show_ps(p, opts, depth = 0):
 
 def explore_ps(opts):
 	pss = { }
-	ps_img = pycriu.images.load(dinf(opts, 'pstree.img'))
+	ps_img = pycriu_images.load(dinf(opts, 'pstree.img'))
 	for p in ps_img['entries']:
-		core = pycriu.images.load(dinf(opts, 'core-%d.img' % get_task_id(p, 'pid')))
+		core = pycriu_images.load(dinf(opts, 'core-%d.img' % get_task_id(p, 'pid')))
 		ps = ps_item(p, core['entries'][0])
 		pss[ps.pid] = ps
 
@@ -180,18 +180,18 @@ def get_file_str(opts, fd):
 	return f
 
 def explore_fds(opts):
-	ps_img = pycriu.images.load(dinf(opts, 'pstree.img'))
+	ps_img = pycriu_images.load(dinf(opts, 'pstree.img'))
 	for p in ps_img['entries']:
 		pid = get_task_id(p, 'pid')
-		idi = pycriu.images.load(dinf(opts, 'ids-%s.img' % pid))
+		idi = pycriu_images.load(dinf(opts, 'ids-%s.img' % pid))
 		fdt = idi['entries'][0]['files_id']
-		fdi = pycriu.images.load(dinf(opts, 'fdinfo-%d.img' % fdt))
+		fdi = pycriu_images.load(dinf(opts, 'fdinfo-%d.img' % fdt))
 
 		print("%d" % pid)
 		for fd in fdi['entries']:
 			print("\t%7d: %s" % (fd['fd'], get_file_str(opts, fd)))
 
-		fdi = pycriu.images.load(dinf(opts, 'fs-%d.img' % pid))['entries'][0]
+		fdi = pycriu_images.load(dinf(opts, 'fs-%d.img' % pid))['entries'][0]
 		print("\t%7s: %s" % ('cwd', get_file_str(opts, {'type': 'REG', 'id': fdi['cwd_id']})))
 		print("\t%7s: %s" % ('root', get_file_str(opts, {'type': 'REG', 'id': fdi['root_id']})))
 
@@ -211,11 +211,11 @@ class vma_id:
 		return ret
 
 def explore_mems(opts):
-	ps_img = pycriu.images.load(dinf(opts, 'pstree.img'))
+	ps_img = pycriu_images.load(dinf(opts, 'pstree.img'))
 	vids = vma_id()
 	for p in ps_img['entries']:
 		pid = get_task_id(p, 'pid')
-		mmi = pycriu.images.load(dinf(opts, 'mm-%d.img' % pid))['entries'][0]
+		mmi = pycriu_images.load(dinf(opts, 'mm-%d.img' % pid))['entries'][0]
 
 		print("%d" % pid)
 		print("\t%-36s    %s" % ('exe', get_file_str(opts, {'type': 'REG', 'id': mmi['exe_file_id']})))
@@ -257,11 +257,11 @@ def explore_mems(opts):
 
 
 def explore_rss(opts):
-	ps_img = pycriu.images.load(dinf(opts, 'pstree.img'))
+	ps_img = pycriu_images.load(dinf(opts, 'pstree.img'))
 	for p in ps_img['entries']:
 		pid = get_task_id(p, 'pid')
-		vmas = pycriu.images.load(dinf(opts, 'mm-%d.img' % pid))['entries'][0]['vmas']
-		pms = pycriu.images.load(dinf(opts, 'pagemap-%d.img' % pid))['entries']
+		vmas = pycriu_images.load(dinf(opts, 'mm-%d.img' % pid))['entries'][0]['vmas']
+		pms = pycriu_images.load(dinf(opts, 'pagemap-%d.img' % pid))['entries']
 
 		print("%d" % pid)
 		vmi = 0
