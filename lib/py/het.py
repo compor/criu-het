@@ -70,8 +70,9 @@ class Converter():
 	### Common
 	def get_symbol_addr(self, binary, symbol):
 		if len(binary_symbols) == 0:
-			session = subprocess.Popen(['nm', binary], stdout=PIPE, stderr=PIPE)
-			_stdout, _stderr = session.communicate()
+			#session = subprocess.Popen(['nm', binary], stdout=PIPE, stderr=PIPE)
+			#_stdout, _stderr = session.communicate()
+			_stdout = subprocess.check_output(['nm', binary], stderr=PIPE, encoding="utf-8")
 			nm_symbols = _stdout.split('\n')
 			for nm_symbol in nm_symbols:
 				sentry = nm_symbol.split()
