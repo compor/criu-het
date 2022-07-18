@@ -79,7 +79,7 @@ class Converter():
 				if sentry is not None:
 					if len(sentry) >2:
 						binary_symbols[sentry[2]] = sentry[0]
-		return long(binary_symbols[symbol], 16)
+		return int(binary_symbols[symbol], 16)
 
 	def __get_symbol_addr(self, binary, symbol):
 		###find address of the structure
@@ -90,7 +90,7 @@ class Converter():
 			e = ELF(binary)
 			ELF_binaries[binary] = e
 
-		addr=long(e.symbols[symbol])
+		addr=int(e.symbols[symbol])
 		het_log("found address", hex(addr))
 		return addr
 
@@ -116,7 +116,7 @@ class Converter():
 		region_offset=-1
 		for dc in  pgm_img['entries']:
 			if 'vaddr' in dc.keys():
-				base = long(dc['vaddr'], 16)
+				base = int(dc['vaddr'], 16)
 				pnbr = dc['nr_pages']
 				end = base+(pnbr*PAGE_SIZE)
 				het_log("current region", hex(base), hex(end), pnbr)
