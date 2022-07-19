@@ -35,6 +35,7 @@ criu/include/version.h
 criu/pie/restorer-blob.h
 criu/pie/parasite-blob.h
 criu/protobuf-desc-gen.h
+build/
 lib/build/
 lib/c/criu.pc
 scripts/build/qemu-user-static/*
