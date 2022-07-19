@@ -1,11 +1,11 @@
 from distutils.core import setup
 import os
 
-CUSTOM_PKG_DIR = os.environ["PY_PKG_DIR"]
-DEFAULT_PKG_DIR = "pycriu"
+ENV_KEY = "PY_PKG_DIR"
+CUSTOM_PKG_DIR = "pycriu" # default fallback value
 
-if CUSTOM_PKG_DIR is None or CUSTOM_PKG_DIR == "":
-    CUSTOM_PKG_DIR = DEFAULT_PKG_DIR
+if ENV_KEY in os.environ and os.environ[ENV_KEY].strip() != "":
+    CUSTOM_PKG_DIR = os.environ[ENV_KEY].strip()
 
 setup(name = "crit",
       version = "0.0.1",
