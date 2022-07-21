@@ -49,6 +49,17 @@ If a package was installed after a failed compilation, use "make mrproper-top" t
 
 Additional packages maybe needed, please refer to: https://criu.org/Installation
 
+In order to allow multiple installations to work in conjunction with one another (i.e., no conflicts or shadow imports)
+the optional environment variable `PY_PKG_DIR` can be set denoting the name of top-level Python module to be used.
+`PY_PKG_DIR` defaults to "pycriu" (i.e., `import pycriu`), if not set explicitly at the commandline.
+If the installation directory is non-standard (i.e., not within `python -m site` locations), you might have to export or
+adjust the `PYTHONPATH` environment variable too, i.e.:
+
+```
+make install PY_PKG_DIR=pycriu_alt DESTDIR=/usr/local/criu-het-unasl PREFIX= PYTHON=python3
+export PYTHONPATH=/usr/local/criu-het-unasl/lib/python3.9/site-packages/
+```
+
 Moreover, it might be preferable to actually select which Python version (2 or 3) the installed Python tools (e.g.,
 `crit`) are meant to use.
 This can be forced by selected the corresponding Python interpreter during building and installing by setting the
