@@ -128,7 +128,7 @@ export CFLAGS USERCLFAGS HOSTCFLAGS
 
 # Default target
 all: criu lib crit popcorn-notify
-.PHONY: all 
+.PHONY: all
 
 #
 # Version headers.
@@ -230,13 +230,13 @@ criu: $(criu-deps)
 
 crit/Makefile: ;
 crit/%: criu .FORCE
-	$(Q) $(MAKE) $(build)=crit $@
+	$(Q) PY_PKG_DIR=$(PY_PKG_DIR) $(MAKE) $(build)=crit $@
 crit: criu
-	$(Q) $(MAKE) $(build)=crit all
+	$(Q) PY_PKG_DIR=$(PY_PKG_DIR) $(MAKE) $(build)=crit all
 .PHONY: crit
 
 
-popcorn-notify: 
+popcorn-notify:
 	$(Q) $(MAKE) -C $@
 .PHONY: popcorn-notify
 
@@ -351,7 +351,7 @@ gcov:
 .PHONY: gcov
 
 docker-build:
-	$(MAKE) -C scripts/build/ x86_64 
+	$(MAKE) -C scripts/build/ x86_64
 .PHONY: docker-build
 
 docker-test:
