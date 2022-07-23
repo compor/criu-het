@@ -60,6 +60,15 @@ make install PY_PKG_DIR=pycriu_alt DESTDIR=/usr/local/criu-het-unasl PREFIX= PYT
 export PYTHONPATH=/usr/local/criu-het-unasl/lib/python3.9/site-packages/
 ```
 
+Alternative to setting the `PYTHONPATH`, a [site-specific configuration hook][1] by creating a `.pth` file in the
+default module search locations. For example, place a line like:
+
+```
+/usr/local/criu-het-unasl/lib/python3.9/site-packages
+```
+
+in a file at `/usr/local/lib/python3.9/dist-packages/criuhetunasl.pth` or similar (again, consult `python -m site`).
+
 Moreover, it might be preferable to actually select which Python version (2 or 3) the installed Python tools (e.g.,
 `crit`) are meant to use.
 This can be forced by selected the corresponding Python interpreter during building and installing by setting the
@@ -78,3 +87,5 @@ This is possible because the Make variable `PYTHON` can be overidden as is curre
 criu-het is installed at same time as criu. However, for criu-het to work correctly, additional
 packages needs to be installed: python-six and pwntools. Both of which are python scripts.
 
+
+[1]: https://docs.python.org/3/library/site.html
