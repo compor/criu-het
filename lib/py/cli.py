@@ -76,10 +76,10 @@ def recode(opts):
     outdir = get_default_arg(opts, "out", "new_image." + str(arch))
     path_append = get_default_arg(opts, "append", "")
     root_dir = get_default_arg(opts, "root", "")
-    if arch == "aarch64":
-        converter = Aarch64Converter()
-    elif arch == "x86_64" or arch == "x86-64":
+    if arch == "x86_64" or arch == "x86-64":
         converter = X8664Converter()
+    else:
+        converter = Aarch64Converter()
     converter.recode(arch, directory, outdir, path_append, root_dir)
 
 
